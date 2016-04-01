@@ -1,4 +1,4 @@
 .component-box{
-	display:inline-flex;
+	display:flex;
 	border:1px solid red;
 }
