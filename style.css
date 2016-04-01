@@ -6,3 +6,8 @@
 .content-box{
 	border:1px solid blue;
 }
+
+.task-list {
+ border:5px solid orange;
+ margin-left:10%;
+}
