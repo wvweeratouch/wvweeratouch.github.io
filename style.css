@@ -1,4 +1,8 @@
-.component-box{
+.container-box{
 	display: inline-flex;
+	border:1px solid red;
+}
+
+.content-box{
 	border:1px solid red;
 }
