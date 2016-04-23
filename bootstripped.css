@@ -1,0 +1,22 @@
+/* BEGIN: Global Styles */
+
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+html, body { /* Make body occupy full browser height */
+    height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+* {
+    border: 1px solid red;
+}
+
+/* END: Global Styles */
