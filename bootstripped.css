@@ -8,7 +8,7 @@ html {
 }
 
 /html, body { /* Make body occupy full browser height */
-   /* height: 100%;*/
+    height: 100%;
 }
 
 
@@ -20,5 +20,28 @@ body {
 * {
     border: 1px solid red;
 }
+
+#header{
+	display: flex;
+}
+
+#logout-button{
+	position: absolute;
+	right:5%;
+
+}
+.yo-button{
+	position:absolute;
+	right: 2%;
+	top:auto;
+	bottom:auto;
+}
+
+.user-name{
+	min-height: 50px;
+	align-content: center;
+}
+
+
 
 /* END: Global Styles */
