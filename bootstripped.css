@@ -7,9 +7,11 @@ html {
     box-sizing: inherit;
 }
 
-html, body { /* Make body occupy full browser height */
-    height: 100%;
+/html, body { /* Make body occupy full browser height */
+   /* height: 100%;*/
 }
+
+
 
 body {
     margin: 0;
