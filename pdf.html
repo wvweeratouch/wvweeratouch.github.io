@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Portfolio — Wave Pongruengkiat</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/portfolio.js"></script>
+<style>
+/* === EDITOR (screen only) === */
+.pdf-editor { max-width: 800px; margin: 0 auto; padding: 140px 24px 48px; }
+.pdf-editor h2 { font-size: 18px; font-weight: 400; margin: 32px 0 16px; color: var(--text); letter-spacing: -0.2px; }
+.pdf-editor label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; font-weight: 300; }
+.pdf-editor input[type="text"] {
+  width: 100%; padding: 10px 14px; background: var(--surface);
+  border: 1px solid var(--border); color: var(--text); font-family: inherit;
+  font-size: 14px; font-weight: 300;
+}
+.pdf-editor input[type="text"]:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+
+.work-list { list-style: none; padding: 0; }
+.work-list-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border: 1px solid var(--border); margin-bottom: 4px;
+  background: var(--surface); cursor: default; transition: border-color 0.2s;
+}
+.work-list-item:hover { border-color: rgba(255,255,255,0.15); }
+.work-list-item input[type="checkbox"] { flex-shrink: 0; cursor: pointer; }
+.work-list-item .drag-handle {
+  cursor: grab; color: var(--text-muted); font-size: 16px; user-select: none; flex-shrink: 0;
+}
+.work-list-item .drag-handle:active { cursor: grabbing; }
+.work-list-item .work-info { flex: 1; }
+.work-list-item .work-title { font-size: 14px; font-weight: 400; }
+.work-list-item .work-meta { font-size: 11px; color: var(--text-dim); font-weight: 300; }
+.work-list-item.dragging { opacity: 0.4; }
+.work-list-item.drag-over { border-top: 2px solid #fff; }
+
+.pdf-options { display: flex; gap: 24px; flex-wrap: wrap; margin: 16px 0; }
+.pdf-options label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.pdf-options input[type="checkbox"] { cursor: pointer; }
+
+.pdf-actions { margin: 32px 0; display: flex; gap: 16px; flex-wrap: wrap; }
+.pdf-btn {
+  padding: 12px 28px; border: 1px solid var(--border);
+  background: transparent; color: var(--text); font-family: inherit;
+  font-size: 12px; font-weight: 300; letter-spacing: 0.5px;
+  cursor: pointer; transition: all 0.2s;
+}
+.pdf-btn:hover { border-color: rgba(255,255,255,0.3); }
+.pdf-btn.primary { background: #fff; color: #000; border-color: #fff; }
+.pdf-btn.primary:hover { opacity: 0.8; }
+
+.pdf-output { display: none; }
+
+/* === PRINT STYLES === */
+@media print {
+  .nav, .footer, .pdf-editor { display: none !important; }
+  .pdf-output { display: block !important; }
+
+  body { background: #fff !important; color: #000 !important; font-size: 11pt; line-height: 1.5; }
+
+  .pdf-page {
+    page-break-after: always;
+    padding: 48px;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  .pdf-page:last-child { page-break-after: auto; }
+
+  .pdf-cover {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+  }
+  .pdf-cover h1 { font-size: 28pt; font-weight: 300; margin-bottom: 8px; color: #000; }
+  .pdf-cover .pdf-cover-subtitle { font-size: 12pt; color: #666; font-weight: 300; }
+  .pdf-cover .pdf-cover-date { font-size: 10pt; color: #999; margin-top: 24px; }
+
+  .pdf-work-page { padding-top: 48px; }
+  .pdf-work-img {
+    width: 100%; max-height: 45vh; object-fit: cover; margin-bottom: 24px;
+  }
+  .pdf-work-page h2 { font-size: 18pt; font-weight: 400; margin-bottom: 4px; color: #000; }
+  .pdf-work-page .pdf-work-meta { font-size: 10pt; color: #666; margin-bottom: 16px; }
+  .pdf-work-page .pdf-work-body { font-size: 10pt; color: #333; line-height: 1.6; }
+  .pdf-work-page .pdf-work-body p { margin-bottom: 8px; }
+  .pdf-work-page .pdf-work-medium { font-size: 9pt; color: #999; margin-top: 12px; }
+
+  .pdf-cv-page h2 {
+    font-size: 16pt; font-weight: 400; margin: 24px 0 8px;
+    border-bottom: 1px solid #ddd; padding-bottom: 4px; color: #000;
+  }
+  .pdf-cv-item { display: flex; gap: 16px; padding: 4px 0; font-size: 10pt; }
+  .pdf-cv-year { width: 60px; color: #999; flex-shrink: 0; }
+  .pdf-cv-detail { flex: 1; }
+  .pdf-cv-detail strong { font-weight: 500; color: #000; }
+  .pdf-cv-detail span { color: #666; }
+
+  @page { size: A4; margin: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Wave Pongruengkiat</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html">Work</a>
+      <a href="archive.html">Archive</a>
+      <a href="cv.html">CV</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- EDITOR (hidden in print) -->
+<div class="pdf-editor" id="pdf-editor">
+  <div class="section-tag">PDF Portfolio Generator</div>
+  <h1 class="section-title" style="margin-bottom:8px">Select &amp; order works</h1>
+  <p style="color:var(--text-dim);font-size:13px;font-weight:300;margin-bottom:32px">
+    Check the works you want, drag to reorder, then Ctrl+P to save as PDF.
+  </p>
+
+  <h2>Cover Page</h2>
+  <label>Title</label>
+  <input type="text" id="pdf-title" value="Wave Pongruengkiat" placeholder="Portfolio title">
+  <label style="margin-top:12px">Subtitle</label>
+  <input type="text" id="pdf-subtitle" value="Selected Works" placeholder="Subtitle">
+
+  <h2>Works</h2>
+  <div id="works-loading" class="work-loading" style="padding:40px 0;">
+    <div class="archive-loading-spinner"></div>
+    <p>Loading works&hellip;</p>
+  </div>
+  <ul class="work-list" id="work-list"></ul>
+
+  <h2>Options</h2>
+  <div class="pdf-options">
+    <label><input type="checkbox" id="opt-statement" checked> Include descriptions</label>
+    <label><input type="checkbox" id="opt-cv"> Include CV page</label>
+  </div>
+
+  <div class="pdf-actions">
+    <button class="pdf-btn primary" id="btn-print">Preview &amp; Print (Ctrl+P)</button>
+    <button class="pdf-btn" id="btn-all">Select All</button>
+    <button class="pdf-btn" id="btn-none">Deselect All</button>
+  </div>
+</div>
+
+<!-- PRINT OUTPUT (shown only in print) -->
+<div class="pdf-output" id="pdf-output"></div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>&copy; 2026 Wave Pongruengkiat</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="https://github.com/wvweeratouch">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var allWorks = [];
+  var cvData = null;
+
+  // Load works
+  Portfolio.fetchWorks().then(function(result) {
+    var list = document.getElementById('work-list');
+    document.getElementById('works-loading').style.display = 'none';
+
+    for (var i = 0; i < result.data.length; i++) {
+      var w = Portfolio.normalizeWork(result.data[i]);
+      if (w.status === 'draft' || !w.title) continue;
+      allWorks.push(w);
+    }
+
+    allWorks.sort(function(a, b) {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+    });
+
+    for (var j = 0; j < allWorks.length; j++) {
+      var w = allWorks[j];
+      var li = document.createElement('li');
+      li.className = 'work-list-item';
+      li.setAttribute('data-index', j);
+      li.setAttribute('draggable', 'true');
+      var meta = [w.year, w.type, w.venue].filter(Boolean).join(' \u2014 ');
+      li.innerHTML = '<span class="drag-handle">&#9776;</span>' +
+        '<input type="checkbox"' + (w.featured ? ' checked' : '') + '>' +
+        '<div class="work-info">' +
+        '<div class="work-title">' + Portfolio.escHtml(w.title) + '</div>' +
+        '<div class="work-meta">' + Portfolio.escHtml(meta) + '</div>' +
+        '</div>';
+      list.appendChild(li);
+    }
+
+    initDragDrop(list);
+  }).catch(function(err) {
+    document.getElementById('works-loading').innerHTML =
+      '<p style="color:var(--text-dim);font-size:13px;">Could not load works.</p>';
+    console.error(err);
+  });
+
+  // Try to load CV data
+  Portfolio.fetchSheet('cv').then(function(result) {
+    cvData = result.data;
+  }).catch(function() { /* CV tab not available */ });
+
+  // Drag and drop
+  function initDragDrop(list) {
+    var dragItem = null;
+
+    list.addEventListener('dragstart', function(e) {
+      var item = e.target.closest('.work-list-item');
+      if (!item) return;
+      dragItem = item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    list.addEventListener('dragend', function() {
+      if (dragItem) dragItem.classList.remove('dragging');
+      var items = list.querySelectorAll('.work-list-item');
+      for (var i = 0; i < items.length; i++) items[i].classList.remove('drag-over');
+      dragItem = null;
+    });
+
+    list.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      var target = e.target.closest('.work-list-item');
+      if (!target || target === dragItem) return;
+      var items = list.querySelectorAll('.work-list-item');
+      for (var i = 0; i < items.length; i++) items[i].classList.remove('drag-over');
+      target.classList.add('drag-over');
+    });
+
+    list.addEventListener('drop', function(e) {
+      e.preventDefault();
+      var target = e.target.closest('.work-list-item');
+      if (!target || !dragItem || target === dragItem) return;
+
+      var items = Array.prototype.slice.call(list.querySelectorAll('.work-list-item'));
+      var dragIdx = items.indexOf(dragItem);
+      var targetIdx = items.indexOf(target);
+
+      if (dragIdx < targetIdx) {
+        list.insertBefore(dragItem, target.nextSibling);
+      } else {
+        list.insertBefore(dragItem, target);
+      }
+
+      reindexWorks();
+    });
+  }
+
+  function reindexWorks() {
+    var items = document.querySelectorAll('#work-list .work-list-item');
+    var newOrder = [];
+    for (var i = 0; i < items.length; i++) {
+      var idx = parseInt(items[i].getAttribute('data-index'));
+      newOrder.push(allWorks[idx]);
+      items[i].setAttribute('data-index', i);
+    }
+    allWorks = newOrder;
+  }
+
+  // Button handlers
+  document.getElementById('btn-all').addEventListener('click', function() {
+    var cbs = document.querySelectorAll('#work-list input[type="checkbox"]');
+    for (var i = 0; i < cbs.length; i++) cbs[i].checked = true;
+  });
+
+  document.getElementById('btn-none').addEventListener('click', function() {
+    var cbs = document.querySelectorAll('#work-list input[type="checkbox"]');
+    for (var i = 0; i < cbs.length; i++) cbs[i].checked = false;
+  });
+
+  document.getElementById('btn-print').addEventListener('click', function() {
+    reindexWorks();
+
+    var title = document.getElementById('pdf-title').value || 'Wave Pongruengkiat';
+    var subtitle = document.getElementById('pdf-subtitle').value || 'Selected Works';
+    var includeDesc = document.getElementById('opt-statement').checked;
+    var includeCV = document.getElementById('opt-cv').checked;
+
+    var items = document.querySelectorAll('#work-list .work-list-item');
+    var selected = [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].querySelector('input[type="checkbox"]').checked) {
+        selected.push(allWorks[i]);
+      }
+    }
+
+    if (selected.length === 0) {
+      alert('Please select at least one work.');
+      return;
+    }
+
+    var E = Portfolio.escHtml;
+    var html = '';
+
+    // Cover page
+    html += '<div class="pdf-page pdf-cover">';
+    html += '<h1>' + E(title) + '</h1>';
+    html += '<div class="pdf-cover-subtitle">' + E(subtitle) + '</div>';
+    html += '<div class="pdf-cover-date">' + new Date().getFullYear() + '</div>';
+    html += '</div>';
+
+    // Work pages
+    for (var w = 0; w < selected.length; w++) {
+      var work = selected[w];
+      html += '<div class="pdf-page pdf-work-page">';
+
+      var img = work.hero || work.thumb;
+      if (img) {
+        html += '<img class="pdf-work-img" src="' + E(img) + '" alt="' + E(work.title) + '">';
+      }
+
+      html += '<h2>' + E(work.title) + '</h2>';
+
+      var meta = [work.year, work.type, work.venue, [work.city, work.country].filter(Boolean).join(', ')].filter(Boolean).join(' \u2014 ');
+      html += '<div class="pdf-work-meta">' + E(meta) + '</div>';
+
+      if (includeDesc) {
+        if (work.statement) {
+          html += '<div class="pdf-work-body">' + Portfolio.renderDescription(work.statement) + '</div>';
+        } else if (work.description) {
+          html += '<div class="pdf-work-body">' + Portfolio.renderDescription(work.description) + '</div>';
+        }
+      }
+
+      if (work.medium) {
+        html += '<div class="pdf-work-medium">Medium: ' + E(work.medium) + '</div>';
+      }
+
+      html += '</div>';
+    }
+
+    // CV page (optional)
+    if (includeCV && cvData) {
+      html += '<div class="pdf-page pdf-cv-page">';
+      html += '<h1 style="font-size:18pt;font-weight:300;margin-bottom:24px;color:#000">Curriculum Vitae</h1>';
+
+      var sections = {};
+      var sectionOrder = [];
+      for (var c = 0; c < cvData.length; c++) {
+        var section = cvData[c].section || 'Other';
+        if (!sections[section]) { sections[section] = []; sectionOrder.push(section); }
+        sections[section].push(cvData[c]);
+      }
+
+      for (var s = 0; s < sectionOrder.length; s++) {
+        var name = sectionOrder[s];
+        var entries = sections[name];
+        html += '<h2>' + E(name) + '</h2>';
+        for (var ent = 0; ent < entries.length; ent++) {
+          var entry = entries[ent];
+          html += '<div class="pdf-cv-item">';
+          html += '<div class="pdf-cv-year">' + E(entry.year || '') + '</div>';
+          html += '<div class="pdf-cv-detail"><strong>' + E(entry.title || '') + '</strong>';
+          var cvMeta = [entry.organization, entry.location].filter(Boolean).join(' \u2014 ');
+          if (cvMeta) html += ' <span>' + E(cvMeta) + '</span>';
+          html += '</div></div>';
+        }
+      }
+
+      html += '</div>';
+    }
+
+    document.getElementById('pdf-output').innerHTML = html;
+    window.print();
+  });
+})();
+</script>
+
+</body>
+</html>

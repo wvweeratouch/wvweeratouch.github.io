@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV — Wave Pongruengkiat</title>
+<meta name="description" content="Curriculum vitae of Wave Pongruengkiat. Education, exhibitions, grants, and selected works.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/portfolio.js"></script>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Wave Pongruengkiat</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html">Work</a>
+      <a href="archive.html">Archive</a>
+      <a href="cv.html" class="active">CV</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="cv-hero">
+  <div class="container">
+    <div class="section-tag">Curriculum Vitae</div>
+    <h1 class="section-title">Wave Pongruengkiat</h1>
+    <p class="cv-subtitle">Interactive Art &amp; Creative Technology &middot; Chiang Mai, Thailand</p>
+  </div>
+</section>
+
+<!-- CV CONTENT -->
+<section class="section">
+  <div class="container">
+    <div id="cv-loading" class="work-loading">
+      <div class="archive-loading-spinner"></div>
+      <p>Loading CV&hellip;</p>
+    </div>
+
+    <div id="cv-content"></div>
+
+    <div id="cv-error" style="display:none;" class="work-404">
+      <div class="section-tag">Not ready yet</div>
+      <h2 class="section-title" style="font-size:clamp(24px,3vw,36px)">CV data not available</h2>
+      <p style="color:var(--text-dim);font-size:14px;font-weight:300;margin-bottom:var(--space-md);">
+        The CV tab hasn&rsquo;t been set up in the Google Sheet yet.<br>
+        Add a &ldquo;cv&rdquo; tab with columns: section, year, title, organization, location, details.
+      </p>
+      <a href="about.html" style="font-size:13px;letter-spacing:1px;text-transform:uppercase;">
+        View About page &rarr;
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>&copy; 2026 Wave Pongruengkiat</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="https://github.com/wvweeratouch">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  Portfolio.fetchSheet('cv').then(function(result) {
+    var data = result.data;
+
+    var sections = {};
+    var sectionOrder = [];
+    for (var i = 0; i < data.length; i++) {
+      var section = data[i].section || 'Other';
+      if (!sections[section]) {
+        sections[section] = [];
+        sectionOrder.push(section);
+      }
+      sections[section].push(data[i]);
+    }
+
+    var E = Portfolio.escHtml;
+    var html = '<div class="cv-sections">';
+
+    for (var s = 0; s < sectionOrder.length; s++) {
+      var name = sectionOrder[s];
+      var items = sections[name];
+
+      html += '<div class="cv-section">';
+      html += '<h2 class="cv-section-title">' + E(name) + '</h2>';
+      html += '<div class="cv-items">';
+
+      for (var j = 0; j < items.length; j++) {
+        var item = items[j];
+        html += '<div class="cv-item">';
+        html += '<div class="cv-year">' + E(item.year || '') + '</div>';
+        html += '<div class="cv-detail">';
+        html += '<div class="cv-title">' + E(item.title || '') + '</div>';
+        var meta = [item.organization, item.location].filter(Boolean).join(' \u2014 ');
+        if (meta) html += '<div class="cv-meta">' + E(meta) + '</div>';
+        if (item.details) html += '<div class="cv-details">' + E(item.details) + '</div>';
+        html += '</div></div>';
+      }
+
+      html += '</div></div>';
+    }
+
+    html += '</div>';
+
+    document.getElementById('cv-loading').style.display = 'none';
+    document.getElementById('cv-content').innerHTML = html;
+  }).catch(function(err) {
+    console.error('CV load error:', err);
+    document.getElementById('cv-loading').style.display = 'none';
+    document.getElementById('cv-error').style.display = 'block';
+  });
+})();
+</script>
+
+</body>
+</html>

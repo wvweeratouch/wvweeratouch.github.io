@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading — Wave Pongruengkiat</title>
+<meta name="description" id="meta-desc" content="Work by Wave Pongruengkiat — Interactive Art & Creative Technology">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/portfolio.js"></script>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Wave Pongruengkiat</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html" class="active">Work</a>
+      <a href="archive.html">Archive</a>
+      <a href="cv.html">CV</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- LOADING STATE -->
+<div id="work-loading" class="work-loading">
+  <div class="archive-loading-spinner"></div>
+  <p>Loading&hellip;</p>
+</div>
+
+<!-- WORK CONTENT (filled by JS) -->
+<div id="work-content" style="display:none"></div>
+
+<!-- 404 STATE -->
+<div id="work-404" class="work-404" style="display:none">
+  <div class="container">
+    <div class="section-tag">Not Found</div>
+    <h1 class="section-title">Work not found</h1>
+    <p style="color:var(--text-dim);font-size:15px;font-weight:300;margin-bottom:var(--space-md);">
+      This work doesn&rsquo;t exist or hasn&rsquo;t been published yet.
+    </p>
+    <a href="archive.html" style="font-size:13px;letter-spacing:1px;text-transform:uppercase;">
+      Browse the archive &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>&copy; 2026 Wave Pongruengkiat</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="https://github.com/wvweeratouch">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var params = new URLSearchParams(location.search);
+  var slug = params.get('slug');
+  if (!slug) { show404(); return; }
+
+  Portfolio.fetchWorks().then(function(result) {
+    var works = [];
+    for (var i = 0; i < result.data.length; i++) {
+      works.push(Portfolio.normalizeWork(result.data[i]));
+    }
+
+    var work = null;
+    for (var i = 0; i < works.length; i++) {
+      if (works[i].slug === slug) { work = works[i]; break; }
+    }
+    if (!work) { show404(); return; }
+    if (work.status === 'draft') { show404(); return; }
+    render(work, works);
+  }).catch(function(err) {
+    console.error('Failed to load work:', err);
+    show404();
+  });
+
+  function show404() {
+    document.getElementById('work-loading').style.display = 'none';
+    document.getElementById('work-404').style.display = 'block';
+  }
+
+  function render(work, allWorks) {
+    document.title = work.title + ' \u2014 Wave Pongruengkiat';
+    var metaDesc = document.getElementById('meta-desc');
+    if (metaDesc && work.description) {
+      metaDesc.content = work.description.substring(0, 160).replace(/\n/g, ' ');
+    }
+
+    var E = Portfolio.escHtml;
+    var html = '';
+
+    // === PROJECT HERO ===
+    html += '<section class="project-hero"><div class="container">';
+    html += '<a href="index.html" class="back-link">&larr; All projects</a>';
+    if (work.type) {
+      html += '<div class="project-tag">' + E(work.type) + '</div>';
+    }
+    html += '<h1>' + E(work.title) + '</h1>';
+
+    if (work.description) {
+      var firstPara = work.description.split('\n\n')[0];
+      if (firstPara.length > 300) firstPara = firstPara.substring(0, 297) + '...';
+      html += '<p class="project-intro">' + E(firstPara) + '</p>';
+    }
+
+    // Meta bar
+    html += '<div class="project-meta-bar">';
+    if (work.year) {
+      html += '<div class="project-meta-item"><div class="meta-label">Year</div>';
+      html += '<div class="meta-value">' + E(work.year) + '</div></div>';
+    }
+    if (work.type) {
+      html += '<div class="project-meta-item"><div class="meta-label">Type</div>';
+      html += '<div class="meta-value">' + E(work.type) + '</div></div>';
+    }
+    if (work.venue) {
+      html += '<div class="project-meta-item"><div class="meta-label">Venue</div>';
+      html += '<div class="meta-value">' + E(work.venue) + '</div></div>';
+    }
+    if (work.city || work.country) {
+      var loc = [work.city, work.country].filter(Boolean).join(', ');
+      html += '<div class="project-meta-item"><div class="meta-label">Location</div>';
+      html += '<div class="meta-value">' + E(loc) + '</div></div>';
+    }
+    if (work.medium) {
+      html += '<div class="project-meta-item"><div class="meta-label">Medium</div>';
+      html += '<div class="meta-value">' + E(work.medium) + '</div></div>';
+    }
+    if (work.collaborators) {
+      html += '<div class="project-meta-item"><div class="meta-label">Collaborators</div>';
+      html += '<div class="meta-value">' + E(work.collaborators) + '</div></div>';
+    }
+    if (work.demo_url) {
+      html += '<div class="project-meta-item"><div class="meta-label">Demo</div>';
+      html += '<div class="meta-value"><a href="' + E(work.demo_url) + '" target="_blank">Try it live &rarr;</a></div></div>';
+    }
+    html += '</div></div></section>';
+
+    // === HERO IMAGE ===
+    var heroImg = work.hero || work.thumb;
+    if (heroImg) {
+      html += '<div class="container"><div class="project-visual-hero" style="background:none">';
+      html += '<img src="' + E(heroImg) + '" alt="' + E(work.title) + '" style="width:100%;height:100%;object-fit:cover;">';
+      html += '</div></div>';
+    }
+
+    // === VIDEO EMBED ===
+    if (work.video) {
+      var videoId = extractYouTubeId(work.video);
+      if (videoId) {
+        html += '<div class="container"><div class="project-visual-hero" style="margin-top:' + (heroImg ? '0' : 'var(--space-xl)') + '">';
+        html += '<iframe src="https://www.youtube.com/embed/' + videoId + '" ';
+        html += 'style="width:100%;height:100%;border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        html += '</div></div>';
+      }
+    }
+
+    // === BODY ===
+    html += '<section class="section"><div class="container">';
+    html += '<div class="project-body">';
+
+    if (work.statement) {
+      html += '<h2>Artist Statement</h2>';
+      html += Portfolio.renderDescription(work.statement);
+    }
+
+    if (work.description) {
+      html += Portfolio.renderDescription(work.description);
+    }
+
+    html += '</div>';
+
+    // === GALLERY ===
+    if (work.gallery) {
+      var images = work.gallery.split(',');
+      var hasImages = false;
+      var galleryHtml = '<div class="project-gallery">';
+      for (var g = 0; g < images.length; g++) {
+        var imgSrc = Portfolio.resolveImage(work.slug, images[g].trim());
+        if (imgSrc) {
+          hasImages = true;
+          galleryHtml += '<div class="project-gallery-item" style="padding:0;background:none">';
+          galleryHtml += '<img src="' + E(imgSrc) + '" alt="' + E(work.title) + ' gallery ' + (g + 1) + '" style="width:100%;height:100%;object-fit:cover;">';
+          galleryHtml += '</div>';
+        }
+      }
+      galleryHtml += '</div>';
+      if (hasImages) html += galleryHtml;
+    }
+
+    // === PREV/NEXT NAV ===
+    var nav = getPrevNext(work, allWorks);
+    html += '<div class="project-nav">';
+    if (nav.prev) {
+      html += '<a href="' + Portfolio.workUrl(nav.prev) + '">';
+      html += '<div class="nav-label">Previous</div>';
+      html += '<div class="nav-title">&larr; ' + E(nav.prev.title) + '</div>';
+      html += '</a>';
+    } else {
+      html += '<div></div>';
+    }
+    if (nav.next) {
+      html += '<a href="' + Portfolio.workUrl(nav.next) + '" class="next">';
+      html += '<div class="nav-label">Next project</div>';
+      html += '<div class="nav-title">' + E(nav.next.title) + ' &rarr;</div>';
+      html += '</a>';
+    } else {
+      html += '<div></div>';
+    }
+    html += '</div>';
+
+    html += '</div></section>';
+
+    document.getElementById('work-loading').style.display = 'none';
+    var content = document.getElementById('work-content');
+    content.innerHTML = html;
+    content.style.display = 'block';
+  }
+
+  function getPrevNext(work, allWorks) {
+    var detailed = allWorks.filter(function(w) {
+      return Portfolio.hasDetailPage(w) && w.status !== 'draft';
+    });
+    detailed.sort(function(a, b) {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      if (a.featured_order !== b.featured_order) return a.featured_order - b.featured_order;
+      return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+    });
+
+    var idx = -1;
+    for (var i = 0; i < detailed.length; i++) {
+      if (detailed[i].slug === work.slug) { idx = i; break; }
+    }
+    return {
+      prev: idx > 0 ? detailed[idx - 1] : null,
+      next: idx >= 0 && idx < detailed.length - 1 ? detailed[idx + 1] : null
+    };
+  }
+
+  function extractYouTubeId(url) {
+    if (!url) return '';
+    var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : '';
+  }
+})();
+</script>
+
+</body>
+</html>

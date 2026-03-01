@@ -1,32 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
-
-    <title>Yo</title>
-
-    <link rel="stylesheet" href="bootstripped.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Pongruengkiat</title>
+<meta name="description" content="Interactive art, creative technology, immersive experiences. Based in Chiang Mai, Thailand.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/portfolio.js"></script>
 </head>
-
 <body>
-    
-    <div id="header">
-        <div id=yo-logo>Yo</div>
-        <button id="logout-button" onclick="logout()"> Log out </button>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Wave Pongruengkiat</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html" class="active">Work</a>
+      <a href="archive.html">Archive</a>
+      <a href="cv.html">CV</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
     </div>
+  </div>
+</nav>
 
+<!-- HERO — full-screen with zoom-in background image -->
+<section class="hero">
+  <div class="hero-bg" style="background-image: url('assets/img/hero.jpg')"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Wave Pongruengkiat</h1>
+    <p class="subtitle">Interactive Art &amp; Creative Technology</p>
+    <p class="subtitle-location">Chiang Mai, Thailand</p>
+  </div>
+</section>
 
-    <div id="user-list">
-        <div id="user-list-title"><h2>Users</h2></div>
+<!-- FEATURED PROJECTS — synced from Google Sheet -->
+<section class="featured-section" id="featured-section">
+  <div class="featured-grid" id="featured-grid">
+    <!-- JS fills this from the spreadsheet -->
+  </div>
+  <div class="view-all">
+    <a href="archive.html">View full archive &rarr;</a>
+  </div>
+</section>
 
-        <div id="user-list-item">
-            <div class="user-name">Tong W. Rattanapan <span><button class="yo-button">Yo</button></span> </div> 
-            <div class="user-name">Bun Suwanprasert <span><button class="yo-button">Yo</button></span> </div>
-            <div class="user-name">Wave W. Pongruengkiat <span><button class="yo-button">Yo</button></span> </div>
-        </div>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>&copy; 2026 Wave Pongruengkiat &middot; Chiang Mai, Thailand</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="https://github.com/wvweeratouch">GitHub</a>
+    </div>
+  </div>
+</footer>
 
-    <div>
+<script>
+(function() {
+  function renderCard(work) {
+    var hasPage = Portfolio.hasDetailPage(work);
+    var tag = hasPage ? 'a' : 'div';
+    var href = hasPage ? ' href="' + Portfolio.workUrl(work) + '"' : '';
+    var E = Portfolio.escHtml;
+
+    var visual;
+    if (work.thumb) {
+      visual = '<div class="featured-card-img"><div class="featured-card-visual" style="background-image:url(\'' + E(work.thumb) + '\')"></div></div>';
+    } else {
+      visual = '<div class="featured-card-img"><div class="featured-card-visual" style="background:' + Portfolio.gradientFor(work.title, work.type) + '"></div></div>';
+    }
+
+    var meta = [];
+    if (work.type) meta.push(E(work.type));
+    if (work.city) meta.push(E(work.city));
+    if (work.year) meta.push(E(work.year));
+
+    return '<' + tag + ' class="featured-card"' + href + '>' +
+      visual +
+      '<div class="featured-card-body">' +
+      '<h3>' + E(work.title) + '</h3>' +
+      (meta.length ? '<p>' + meta.join(', ') + '</p>' : '') +
+      '</div></' + tag + '>';
+  }
+
+  function init() {
+    var grid = document.getElementById('featured-grid');
+
+    Portfolio.fetchWorks()
+      .then(function(result) {
+        var featured = [];
+        for (var i = 0; i < result.data.length; i++) {
+          var work = Portfolio.normalizeWork(result.data[i]);
+          if (!work.title || work.status === 'draft') continue;
+          if (!work.featured) continue;
+          featured.push(work);
+        }
+
+        // Sort by featured_order
+        featured.sort(function(a, b) {
+          return a.featured_order - b.featured_order;
+        });
+
+        if (featured.length > 8) featured = featured.slice(0, 8);
+
+        if (featured.length > 0) {
+          var html = '';
+          for (var j = 0; j < featured.length; j++) html += renderCard(featured[j]);
+          grid.innerHTML = html;
+        } else {
+          renderFallback();
+        }
+      })
+      .catch(function() {
+        renderFallback();
+      });
+  }
+
+  function renderFallback() {
+    var grid = document.getElementById('featured-grid');
+    var fallback = [
+      { title: 'CEING Experiment', type: 'Interactive Installation', year: '2025', slug: 'ceing-experiment', gradient: 'linear-gradient(135deg, #0a1628 0%, #0d2847 30%, #22d3ee 100%)' },
+      { title: 'Khwan Dance', type: 'Performance', year: 'Korea ACC', slug: 'khwan-dance', gradient: 'linear-gradient(135deg, #1a0a1e 0%, #2d1035 30%, #f472b6 100%)' },
+      { title: 'Kong Interactive', type: 'Installation', year: '179 iterations', slug: 'kong-interactive', gradient: 'linear-gradient(135deg, #1a1008 0%, #2d1d0a 30%, #fb923c 100%)' },
+      { title: 'ZER0NE', type: 'Art Residency', year: 'Korea', slug: 'zer0ne-korea', gradient: 'linear-gradient(135deg, #0f0a1e 0%, #1a1035 30%, #a78bfa 100%)' },
+      { title: 'Data Mask', type: 'Interactive Installation', year: 'CMDW', slug: 'data-mask', gradient: 'linear-gradient(135deg, #0a1428 0%, #0d2040 30%, #60a5fa 100%)' },
+      { title: 'Technobiological Futures', type: 'Research', year: '2026\u20132027', slug: 'technobiological-futures', gradient: 'linear-gradient(135deg, #0a1a10 0%, #0d2d18 30%, #4ade80 100%)' }
+    ];
+    var html = '';
+    for (var i = 0; i < fallback.length; i++) {
+      var f = fallback[i];
+      html += '<a class="featured-card" href="work.html?slug=' + f.slug + '">' +
+        '<div class="featured-card-img"><div class="featured-card-visual" style="background:' + f.gradient + '"></div></div>' +
+        '<div class="featured-card-body"><h3>' + f.title + '</h3><p>' + f.type + ', ' + f.year + '</p></div></a>';
+    }
+    grid.innerHTML = html;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
 </body>
 </html>

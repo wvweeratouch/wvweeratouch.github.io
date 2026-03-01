@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive — Wave Pongruengkiat</title>
+<meta name="description" content="Complete project archive, 2014–2025. 50+ projects across exhibitions, performances, workshops, and installations.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/portfolio.js"></script>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Wave Pongruengkiat</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html">Work</a>
+      <a href="archive.html" class="active">Archive</a>
+      <a href="cv.html">CV</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="archive-hero">
+  <div class="container">
+    <div class="section-tag">Archive</div>
+    <h1 class="section-title">All projects, 2014&ndash;2025</h1>
+    <p class="archive-subtitle" id="archive-subtitle">Loading projects&hellip;</p>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<div class="archive-filters" id="archive-filters">
+  <div class="archive-filters-inner">
+    <button class="filter-tab active" data-filter="all">All</button>
+  </div>
+</div>
+
+<!-- GRID -->
+<section class="section">
+  <div class="container">
+    <div class="archive-grid" id="archive-grid">
+      <div class="archive-loading" id="archive-loading">
+        <div class="archive-loading-spinner"></div>
+        <p>Fetching projects from Google Sheets&hellip;</p>
+      </div>
+    </div>
+
+    <div class="archive-error" id="archive-error" style="display:none;">
+      <p id="archive-error-msg">Could not load projects.</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+        If viewing locally, this page needs a web server.<br>
+        Push to GitHub Pages or run: <code style="color:var(--text)">python -m http.server</code>
+      </p>
+      <a href="#" onclick="location.reload(); return false;" class="archive-retry">Retry &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>&copy; 2026 Wave Pongruengkiat</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="https://github.com/wvweeratouch">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  function renderCard(work) {
+    var hasPage = Portfolio.hasDetailPage(work);
+    var tag = hasPage ? 'a' : 'div';
+    var hrefAttr = hasPage ? ' href="' + Portfolio.workUrl(work) + '"' : '';
+    var E = Portfolio.escHtml;
+    var accent = Portfolio.accentFor(work.title, work.type);
+
+    var visual;
+    if (work.thumb) {
+      visual = '<div class="archive-card-visual" style="background-image:url(\'' + E(work.thumb) + '\')">' +
+               '<div class="archive-card-overlay"></div></div>';
+    } else {
+      visual = '<div class="archive-card-visual archive-card-gradient" style="background:' +
+               Portfolio.gradientFor(work.title, work.type) + '">' +
+               '<div class="archive-card-overlay"></div></div>';
+    }
+
+    var badge = '';
+    if (work.type) {
+      badge = '<span class="archive-card-badge" style="background:' + accent + '15;color:' + accent + '">' +
+              E(work.type) + '</span>';
+    }
+
+    var location = [];
+    if (work.city) location.push(E(work.city));
+    if (work.country) location.push(E(work.country));
+    var meta = '';
+    if (work.venue || location.length) {
+      var parts = [];
+      if (work.venue) parts.push(E(work.venue));
+      if (location.length) parts.push(location.join(', '));
+      meta = '<div class="archive-card-meta">' + parts.join(' &middot; ') + '</div>';
+    }
+
+    var featured = hasPage ? '<span class="archive-card-featured">View project &rarr;</span>' : '';
+
+    return '<' + tag + ' class="archive-card"' + hrefAttr + '>' +
+           visual +
+           '<div class="archive-card-body">' +
+           '<div class="archive-card-year">' + E(work.year) + '</div>' +
+           '<h3 class="archive-card-title">' + E(work.title) + '</h3>' +
+           badge + meta + featured +
+           '</div></' + tag + '>';
+  }
+
+  function init() {
+    var grid = document.getElementById('archive-grid');
+    var loading = document.getElementById('archive-loading');
+    var errorEl = document.getElementById('archive-error');
+    var subtitle = document.getElementById('archive-subtitle');
+    var filtersInner = document.querySelector('.archive-filters-inner');
+
+    Portfolio.fetchWorks()
+      .then(function(result) {
+        var works = [];
+        var categories = {};
+        var countries = {};
+
+        for (var i = 0; i < result.data.length; i++) {
+          var work = Portfolio.normalizeWork(result.data[i]);
+          if (!work.title || work.status === 'draft') continue;
+          works.push(work);
+
+          var cat = Portfolio.primaryCategory(work.type);
+          if (cat) categories[cat] = (categories[cat] || 0) + 1;
+          if (work.country) countries[work.country.trim()] = true;
+        }
+
+        works.sort(function(a, b) {
+          return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+        });
+
+        var countryCount = Object.keys(countries).length;
+        subtitle.textContent = works.length + ' projects' +
+          (countryCount > 0 ? ' across ' + countryCount + ' countries' : '');
+
+        var sortedCats = Object.keys(categories).sort(function(a, b) {
+          return categories[b] - categories[a];
+        });
+        filtersInner.querySelector('.filter-tab').textContent = 'All (' + works.length + ')';
+
+        for (var c = 0; c < sortedCats.length; c++) {
+          var btn = document.createElement('button');
+          btn.className = 'filter-tab';
+          btn.setAttribute('data-filter', sortedCats[c]);
+          btn.textContent = sortedCats[c] + ' (' + categories[sortedCats[c]] + ')';
+          filtersInner.appendChild(btn);
+        }
+
+        loading.style.display = 'none';
+        var html = '';
+        for (var j = 0; j < works.length; j++) html += renderCard(works[j]);
+        grid.innerHTML = html;
+
+        filtersInner.addEventListener('click', function(e) {
+          if (!e.target.classList.contains('filter-tab')) return;
+          var filter = e.target.getAttribute('data-filter');
+          var tabs = filtersInner.querySelectorAll('.filter-tab');
+          for (var t = 0; t < tabs.length; t++) tabs[t].classList.remove('active');
+          e.target.classList.add('active');
+
+          var filtered = filter === 'all'
+            ? works
+            : works.filter(function(w) { return Portfolio.primaryCategory(w.type) === filter; });
+
+          var h = '';
+          for (var k = 0; k < filtered.length; k++) h += renderCard(filtered[k]);
+          grid.innerHTML = h;
+        });
+      })
+      .catch(function(err) {
+        console.error('Archive fetch error:', err);
+        loading.style.display = 'none';
+        errorEl.style.display = 'block';
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
