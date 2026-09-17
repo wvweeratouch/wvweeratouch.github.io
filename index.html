@@ -6,28 +6,20 @@
 <title>Wave Pongruengkiat</title>
 <meta name="description" content="Interactive art, creative technology, immersive experiences. Based in Chiang Mai, Thailand.">
 <link rel="stylesheet" href="assets/css/style.css">
-<script src="assets/js/portfolio.js"></script>
 </head>
 <body>
 
-<!-- NAVIGATION -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">Wave Pongruengkiat</a>
     <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
-    <div class="nav-links">
-      <a href="index.html" class="active">Work</a>
-      <a href="archive.html">Archive</a>
-      <a href="cv.html">CV</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-    </div>
+    <div class="nav-links"><a href="index.html" class="active">Home</a><a href="project.html">Project</a><a href="course.html">Course</a><a href="biography.html">Biography</a></div>
   </div>
 </nav>
 
-<!-- HERO — full-screen with zoom-in background image -->
+
 <section class="hero">
-  <div class="hero-bg" style="background-image: url('assets/img/hero.jpg')"></div>
+  <div class="hero-bg" style="background-image:url('assets/img/works/khwantum-a-lecture-performance/khwantum-a-lecture-performance_01.jpg')"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <h1>Wave Pongruengkiat</h1>
@@ -36,116 +28,22 @@
   </div>
 </section>
 
-<!-- FEATURED PROJECTS — synced from Google Sheet -->
-<section class="featured-section" id="featured-section">
-  <div class="featured-grid" id="featured-grid">
-    <!-- JS fills this from the spreadsheet -->
-  </div>
-  <div class="view-all">
-    <a href="archive.html">View full archive &rarr;</a>
-  </div>
+<section class="featured-section">
+  <div class="featured-grid"><a class="featured-card" href="works/khwantum-a-lecture-performance.html"><div class="featured-card-img"><div class="featured-card-visual" style="background-image:url('assets/img/works/khwantum-a-lecture-performance/khwantum-a-lecture-performance_01.jpg')"></div></div><div class="featured-card-body"><h3>KHWANTUM — A Lecture Performance</h3><p>Lecture Performance, Chiang Mai, Thailand, 2026</p></div></a><a class="featured-card" href="works/artscience-entanglement.html"><div class="featured-card-img"><div class="featured-card-visual" style="background-image:url('assets/img/works/artscience-entanglement-lab-wit-in-bangkok-2026/artscience-entanglement-lab-wit-in-bangkok-2026_01.jpg')"></div></div><div class="featured-card-body"><h3>ArtScience Entanglement</h3><p>Public Workshop, Bangkok, Thailand, 2026 &middot; 2 showings</p></div></a><a class="featured-card" href="works/khwan-dance.html"><div class="featured-card-img"><div class="featured-card-visual" style="background-image:url('assets/img/works/khwan-dance-kosmos-2026/khwan-dance-kosmos-2026_01.jpg')"></div></div><div class="featured-card-body"><h3>Khwan Dance</h3><p>Performance, Chiang Mai, Thailand, 2023-2026 &middot; 4 showings</p></div></a><a class="featured-card" href="works/wish-upons-the-passing-astroparticles.html"><div class="featured-card-img"><div class="featured-card-visual" style="background-image:url('assets/img/works/wish-upons-the-passing-astroparticles/wish-upons-the-passing-astroparticles_01.jpg')"></div></div><div class="featured-card-body"><h3>Wish upons the passing astroparticles</h3><p>Interactive Installation, Chiang Mai, Thailand, 2024</p></div></a><a class="featured-card" href="works/water-the-apology.html"><div class="featured-card-img"><div class="featured-card-visual" style="background-image:url('assets/img/works/water-the-apology/water-the-apology_01.jpg')"></div></div><div class="featured-card-body"><h3>WATER: THE APOLOGY</h3><p>Installation, Chiang Mai, Thailand, 2023</p></div></a><a class="featured-card" href="works/the-oracle.html"><div class="featured-card-img"><div class="featured-card-visual" style="background-image:url('assets/img/works/the-oracle/the-oracle_01.jpg')"></div></div><div class="featured-card-body"><h3>The Oracle</h3><p>Installation, Los Angeles, USA, 2026</p></div></a></div>
+  <div class="view-all"><a href="project.html">See all projects &rarr;</a></div>
 </section>
 
-<!-- FOOTER -->
+
 <footer class="footer">
   <div class="container footer-inner">
     <p>&copy; 2026 Wave Pongruengkiat &middot; Chiang Mai, Thailand</p>
     <div class="footer-links">
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+      <a href="biography.html">Biography</a>
+      <a href="project.html">Project</a>
       <a href="https://github.com/wvweeratouch">GitHub</a>
     </div>
   </div>
 </footer>
-
-<script>
-(function() {
-  function renderCard(work) {
-    var hasPage = Portfolio.hasDetailPage(work);
-    var tag = hasPage ? 'a' : 'div';
-    var href = hasPage ? ' href="' + Portfolio.workUrl(work) + '"' : '';
-    var E = Portfolio.escHtml;
-
-    var visual;
-    if (work.thumb) {
-      visual = '<div class="featured-card-img"><div class="featured-card-visual" style="background-image:url(\'' + E(work.thumb) + '\')"></div></div>';
-    } else {
-      visual = '<div class="featured-card-img"><div class="featured-card-visual" style="background:' + Portfolio.gradientFor(work.title, work.type) + '"></div></div>';
-    }
-
-    var meta = [];
-    if (work.type) meta.push(E(work.type));
-    if (work.city) meta.push(E(work.city));
-    if (work.year) meta.push(E(work.year));
-
-    return '<' + tag + ' class="featured-card"' + href + '>' +
-      visual +
-      '<div class="featured-card-body">' +
-      '<h3>' + E(work.title) + '</h3>' +
-      (meta.length ? '<p>' + meta.join(', ') + '</p>' : '') +
-      '</div></' + tag + '>';
-  }
-
-  function init() {
-    var grid = document.getElementById('featured-grid');
-
-    Portfolio.fetchWorks()
-      .then(function(result) {
-        var featured = [];
-        for (var i = 0; i < result.data.length; i++) {
-          var work = Portfolio.normalizeWork(result.data[i]);
-          if (!work.title || work.status === 'draft') continue;
-          if (!work.featured) continue;
-          featured.push(work);
-        }
-
-        // Sort by featured_order
-        featured.sort(function(a, b) {
-          return a.featured_order - b.featured_order;
-        });
-
-        if (featured.length > 8) featured = featured.slice(0, 8);
-
-        if (featured.length > 0) {
-          var html = '';
-          for (var j = 0; j < featured.length; j++) html += renderCard(featured[j]);
-          grid.innerHTML = html;
-        } else {
-          renderFallback();
-        }
-      })
-      .catch(function() {
-        renderFallback();
-      });
-  }
-
-  function renderFallback() {
-    var grid = document.getElementById('featured-grid');
-    var fallback = [
-      { title: 'CEING Experiment', type: 'Interactive Installation', year: '2025', slug: 'ceing-experiment', gradient: 'linear-gradient(135deg, #0a1628 0%, #0d2847 30%, #22d3ee 100%)' },
-      { title: 'Khwan Dance', type: 'Performance', year: 'Korea ACC', slug: 'khwan-dance', gradient: 'linear-gradient(135deg, #1a0a1e 0%, #2d1035 30%, #f472b6 100%)' },
-      { title: 'Kong Interactive', type: 'Installation', year: '179 iterations', slug: 'kong-interactive', gradient: 'linear-gradient(135deg, #1a1008 0%, #2d1d0a 30%, #fb923c 100%)' },
-      { title: 'ZER0NE', type: 'Art Residency', year: 'Korea', slug: 'zer0ne-korea', gradient: 'linear-gradient(135deg, #0f0a1e 0%, #1a1035 30%, #a78bfa 100%)' },
-      { title: 'Data Mask', type: 'Interactive Installation', year: 'CMDW', slug: 'data-mask', gradient: 'linear-gradient(135deg, #0a1428 0%, #0d2040 30%, #60a5fa 100%)' },
-      { title: 'Technobiological Futures', type: 'Research', year: '2026\u20132027', slug: 'technobiological-futures', gradient: 'linear-gradient(135deg, #0a1a10 0%, #0d2d18 30%, #4ade80 100%)' }
-    ];
-    var html = '';
-    for (var i = 0; i < fallback.length; i++) {
-      var f = fallback[i];
-      html += '<a class="featured-card" href="work.html?slug=' + f.slug + '">' +
-        '<div class="featured-card-img"><div class="featured-card-visual" style="background:' + f.gradient + '"></div></div>' +
-        '<div class="featured-card-body"><h3>' + f.title + '</h3><p>' + f.type + ', ' + f.year + '</p></div></a>';
-    }
-    grid.innerHTML = html;
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
 
 </body>
 </html>
