@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fleur Café Valentine’s Day — Wave Pongruengkiat</title>
-<meta name="description" content="Site-specific light installation.">
-<link rel="stylesheet" href="../assets/css/style.css">
+<title>Fleur Café Valentine’s Day · Wave Pongruengkiat</title>
+<meta name="description" content="A light installation using projection for Valentine's Day dining at Fleur Café, Chiang Mai, 2023, made with tomorrow.lab">
+<link rel="stylesheet" href="../assets/css/style.css?v=39233b9b">
 </head>
 <body>
 
@@ -13,26 +13,40 @@
   <div class="nav-inner">
     <a href="../index.html" class="nav-logo">Wave Pongruengkiat</a>
     <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
-    <div class="nav-links"><a href="../index.html">Home</a><a href="../project.html" class="active">Project</a><a href="../course.html">Course</a><a href="../biography.html">Biography</a></div>
+    <div class="nav-links"><a href="../index.html">Home</a><a href="../project.html" class="active">Projects</a><a href="../course.html">Courses</a><a href="../biography.html">Biography</a></div>
   </div>
 </nav>
 
 
 <section class="project-hero">
   <div class="container">
-    <div class="section-tag">Commission</div>
+    <div class="section-tag">Artwork</div>
     <h1 class="section-title">Fleur Café Valentine’s Day</h1>
+    <figure class="work-hero"><img src="../assets/img/picks/fleur-caf-valentines-day/01_b3b1c434.jpg" alt="Fleur Café Valentine’s Day"></figure>
   </div>
 </section>
 <section class="section">
   <div class="container">
-    <div class="project-meta-bar"><div class="project-meta-item"><strong>Year</strong><span>2023</span></div><div class="project-meta-item"><strong>Type</strong><span>Commission</span></div><div class="project-meta-item"><strong>Role</strong><span>Creative Technologist</span></div><div class="project-meta-item"><strong>Collaborators</strong><span>tomorrow.Lab</span></div><div class="project-meta-item"><strong>Dimensions</strong><span>ขนาดแปรผันตามพื้นที่ติดตั้ง</span></div><div class="project-meta-item"><strong>Support</strong><span>Fleur Cafe</span></div></div>
-    <div class="project-body"><p>Site-specific light installation.</p></div>
+    <div class="project-meta-bar"><div class="project-meta-item"><div class="meta-label">Year</div><div class="meta-value">2023</div></div><div class="project-meta-item"><div class="meta-label">Role</div><div class="meta-value">Creative Technologist</div></div><div class="project-meta-item"><div class="meta-label">Collaborators</div><div class="meta-value">tomorrow.lab</div></div><div class="project-meta-item"><div class="meta-label">Medium</div><div class="meta-value">Projection</div></div><div class="project-meta-item"><div class="meta-label">Dimensions</div><div class="meta-value">Dimensions variable</div></div></div>
+    <div class="project-body"><p>A light installation using projection for Valentine's Day dining at Fleur Café, Chiang Mai, 2023, made with tomorrow.lab</p></div>
+    <div class="work-detail">
     
     <h2>Shown</h2>
-    <div class="exhibition-list"><div class="exhibition-item"><span class="exhibition-year">2023</span><span class="exhibition-detail">Chiang Mai &middot; Chiang Mai, Thailand</span></div></div>
+    <div class="exhibition-list"><div class="exhibition-item"><span class="exhibition-year">2023</span><span class="exhibition-detail">Chiang Mai, Thailand</span></div></div>
     
-    <div class="project-gallery"><div class="project-gallery-item"><img src="../assets/img/works/fleur-caf-valentines-day/fleur-caf-valentines-day_01.jpg" alt="Fleur Café Valentine’s Day" loading="lazy"></div></div>
+    </div>
+    <div class="gv" id="gallery"><div class="gv-main" id="gv-main"><img src="../assets/img/picks/fleur-caf-valentines-day/02_42a1aaf1.jpg" alt="Fleur Café Valentine’s Day"></div><div class="gv-thumbs" id="gallery-thumbs"><a class="gv-thumb" href="../assets/img/picks/fleur-caf-valentines-day/01_b3b1c434.jpg" data-kind="img" data-src="../assets/img/picks/fleur-caf-valentines-day/01_b3b1c434.jpg"><img src="../assets/img/picks/fleur-caf-valentines-day/01_b3b1c434.jpg" alt="" loading="lazy"></a><a class="gv-thumb is-on" href="../assets/img/picks/fleur-caf-valentines-day/02_42a1aaf1.jpg" data-kind="img" data-src="../assets/img/picks/fleur-caf-valentines-day/02_42a1aaf1.jpg"><img src="../assets/img/picks/fleur-caf-valentines-day/02_42a1aaf1.jpg" alt="" loading="lazy"></a><a class="gv-thumb" href="../assets/img/picks/fleur-caf-valentines-day/03_fa405eb5.jpg" data-kind="img" data-src="../assets/img/picks/fleur-caf-valentines-day/03_fa405eb5.jpg"><img src="../assets/img/picks/fleur-caf-valentines-day/03_fa405eb5.jpg" alt="" loading="lazy"></a><a class="gv-thumb" href="../assets/img/picks/fleur-caf-valentines-day/04_0ad7301a.jpg" data-kind="img" data-src="../assets/img/picks/fleur-caf-valentines-day/04_0ad7301a.jpg"><img src="../assets/img/picks/fleur-caf-valentines-day/04_0ad7301a.jpg" alt="" loading="lazy"></a></div></div><script>
+document.querySelectorAll('.gv-thumb').forEach(function (a) {
+  a.addEventListener('click', function (ev) {
+    ev.preventDefault();
+    var m = document.getElementById('gv-main');
+    m.innerHTML = a.dataset.kind === 'video'
+      ? '<div class="gv-video"><iframe src="' + a.dataset.src + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>'
+      : '<img src="' + a.dataset.src + '" alt="">';
+    document.querySelectorAll('.gv-thumb').forEach(function (x) { x.classList.toggle('is-on', x === a); });
+  });
+});
+</script>
     <div class="project-nav"><a href="../project.html">&larr; All projects</a></div>
   </div>
 </section>
@@ -43,7 +57,7 @@
     <p>&copy; 2026 Wave Pongruengkiat &middot; Chiang Mai, Thailand</p>
     <div class="footer-links">
       <a href="../biography.html">Biography</a>
-      <a href="../project.html">Project</a>
+      <a href="../project.html">Projects</a>
       <a href="https://github.com/wvweeratouch">GitHub</a>
     </div>
   </div>
